@@ -1,2 +1,2 @@
 # IsingModel
-The Ising Model in Python
+THIS IS A MERGE CONFLICT The Ising Model in Python
