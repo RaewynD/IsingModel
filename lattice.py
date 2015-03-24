@@ -29,13 +29,13 @@ class Lattice:
 #               array.append(1)
             return array
 
-        # Recursive case 
+        # Recursive case
         else:
             array=[]
             currentDimension = self.dimensions[depth]
 
             # for each element in each dimension recursivly
-            # call the function    
+            # call the function
             for i in xrange(0,currentDimension):
                 array.append(self.recursive_allocator(depth+1))
             return array
@@ -43,28 +43,16 @@ class Lattice:
 
     def calculate_hamiltonian_lattice(self):
         depth = 0
-#        print "WHAT"
-#        print lattice
         return self.recursive_hamiltonian(self.lattice,depth)
 
     def recursive_hamiltonian(self, sublattice,depth):
-#        print "HEY"
         if depth == len(self.dimensions)-1:
             sum = self.calculate_hamiltonian_array(sublattice)
-#           print "BASE CASE"
-#           print sublattice
-#           print sum
             return sum
         else:
-#           print "NO"
             sum = 0
-#           print sublattice
-#           print len(sublattice)
             for i in range(len(sublattice)):
                 sum = sum + self.recursive_hamiltonian(sublattice[i],depth+1)
-#               print "RECURSIVE CALL"
-#               print sublattice
-#               print sum
             return sum
 
 
@@ -76,12 +64,26 @@ class Lattice:
         return sum
 
     def delta_hamiltonian(self,position):
+        originalSum = 0
+        newSum = 0
+        positionValue = 0
+        exec "positionValue = " + getPositionStr(position)
+        newPositionValue = positionValue*-1
         for i in range(len(position)):
-            temppos = position
-            temppos[i] = temppos[i] + 1
-            
+            maxLength = self.dimensions[i]
+            tempPosA = position
+            tempPosA[i] = (tempPosA[i] + 1)%maxLength
+            tempPosB = position
+            tempPosB[i] = (tempPosB[i] - 1)%maxLength
+            exec "oldSum += " + positionValue*self.getPositionStr(tempPosA)
+            exec "oldSum += " + positionValue*self.getPositionStr(tempPosB)
+            exec "newSum += " + positionValue*self.getPositionStr(tempPosA)
+            exec "newSum += " + newPositionValue*self.getPositionStr(tempPosB)
+        return -1*abs(newSum - oldSum)
 
-    def getPosStr(self, position):
+
+
+    def getPositionStr(self, position):
         temp = "self.lattice"
         for i in position:
             temp = temp + "[" + str(i) + "]"
