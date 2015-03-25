@@ -39,7 +39,21 @@ class Lattice:
             for i in xrange(0,currentDimension):
                 array.append(self.recursive_allocator(depth+1))
             return array
+        
+    def getPositionStr(self, position):
+        temp = "self.lattice"
+        for i in position:
+            temp = temp + "[" + str(i) + "]"
+        return temp
 
+    def updatePositionVal(self, position):
+        exec self.getPositionStr(position) + " = " + self.getPositionStr(position) + "*(-1)"
+
+    # print object Lattice
+    def printLattice(self):
+        print "kt: ", self.kt
+        print "dims: ", self.dimensions
+        print "lattice: ", self.lattice
 
     def calculate_hamiltonian_lattice(self):
         depth = 0
@@ -55,7 +69,6 @@ class Lattice:
                 sum = sum + self.recursive_hamiltonian(sublattice[i],depth+1)
             return sum
 
-
     # calculate the hamiltonian for any 1D array
     def calculate_hamiltonian_array(self,array):
         sum=0
@@ -63,38 +76,46 @@ class Lattice:
             sum=sum+(array[i]*array[(i+1)%len(array)])
         return sum
 
+    def calculate_lattice_magnitization(self):
+        depth = 0
+        return self.recursive_magnitization(self.lattice,depth)
+
+    def recursive_magnitization(self, sublattice,depth):
+        if depth == len(self.dimensions)-1:
+            sum = self.calculate_array_magnitization(sublattice)
+            return sum
+        else:
+            sum = 0
+            for i in range(len(sublattice)):
+                sum = sum + self.recursive_magnitization(sublattice[i],depth+1)
+            return sum
+
+    # calculate the hamiltonian for any 1D array
+    def calculate_array_magnitization(self,array):
+        sum=0
+        for i in range(len(array)):
+            sum=sum+array[i]
+        return sum
+
     def delta_hamiltonian(self,position):
         originalSum = 0
         newSum = 0
         positionValue = 0
         exec "positionValue = " + getPositionStr(position)
-        newPositionValue = positionValue*-1
+        newPositionValue = positionValue*(-1)
         for i in range(len(position)):
             maxLength = self.dimensions[i]
             tempPosA = position
             tempPosA[i] = (tempPosA[i] + 1)%maxLength
             tempPosB = position
             tempPosB[i] = (tempPosB[i] - 1)%maxLength
-            exec "oldSum += " + positionValue*self.getPositionStr(tempPosA)
-            exec "oldSum += " + positionValue*self.getPositionStr(tempPosB)
-            exec "newSum += " + newPositionValue*self.getPositionStr(tempPosA)  
-            exec "newSum += " + newPositionValue*self.getPositionStr(tempPosB)
+            exec "oldSum += " + positionValue*(self.getPositionStr(tempPosA))
+            exec "oldSum += " + positionValue*(self.getPositionStr(tempPosB))
+            exec "newSum += " + newPositionValue*(self.getPositionStr(tempPosA))  
+            exec "newSum += " + newPositionValue*(self.getPositionStr(tempPosB))
         return -1*(newSum - oldSum)
 
 
-
-
-    def getPositionStr(self, position):
-        temp = "self.lattice"
-        for i in position:
-            temp = temp + "[" + str(i) + "]"
-        return temp
-
-    # print object Lattice
-    def printLattice(self):
-        print "kt: ", self.kt
-        print "dims: ", self.dimensions
-        print "lattice: ", self.lattice
 
 # TODO REMOVE THIS LATER
 def getPos(thing, position):
@@ -102,6 +123,10 @@ def getPos(thing, position):
         for i in position:
             temp = temp + "[" + str(i) + "]"
         return temp
+
+def posFlipTest(lattice, position):
+    if random.random() < math.exp(-lattice.delta_hamiltonian(position)/lattice.kt):
+        lattice.updatePostion(position)
 
 def main():
         if len(sys.argv) < 3:
