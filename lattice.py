@@ -77,9 +77,10 @@ class Lattice:
             tempPosB[i] = (tempPosB[i] - 1)%maxLength
             exec "oldSum += " + positionValue*self.getPositionStr(tempPosA)
             exec "oldSum += " + positionValue*self.getPositionStr(tempPosB)
-            exec "newSum += " + positionValue*self.getPositionStr(tempPosA)
+            exec "newSum += " + newPositionValue*self.getPositionStr(tempPosA)  
             exec "newSum += " + newPositionValue*self.getPositionStr(tempPosB)
-        return -1*abs(newSum - oldSum)
+        return -1*(newSum - oldSum)
+
 
 
 
