@@ -55,65 +55,65 @@ class Lattice:
         print "dims: ", self.dimensions
         print "lattice: ", self.lattice
 
-    def calculate_hamiltonian_lattice(self):
-        depth = 0
-        return self.recursive_hamiltonian(self.lattice,depth)
+def calculate_hamiltonian_lattice(lattice):
+    depth = 0
+    return recursive_hamiltonian(lattice,lattice.lattice,depth)
 
-    def recursive_hamiltonian(self, sublattice,depth):
-        if depth == len(self.dimensions)-1:
-            sum = self.calculate_hamiltonian_array(sublattice)
-            return sum
-        else:
-            sum = 0
-            for i in range(len(sublattice)):
-                sum = sum + self.recursive_hamiltonian(sublattice[i],depth+1)
-            return sum
-
-    # calculate the hamiltonian for any 1D array
-    def calculate_hamiltonian_array(self,array):
-        sum=0
-        for i in range(len(array)):
-            sum=sum+(array[i]*array[(i+1)%len(array)])
+def recursive_hamiltonian(lattice, sublattice, depth):
+    if depth == len(lattice.dimensions)-1:
+        sum = calculate_hamiltonian_array(sublattice)
+        return sum
+    else:
+        sum = 0
+        for i in range(len(sublattice)):
+            sum = sum + recursive_hamiltonian(lattice,sublattice[i],depth+1)
         return sum
 
-    def calculate_lattice_magnitization(self):
-        depth = 0
-        return self.recursive_magnitization(self.lattice,depth)
+# calculate the hamiltonian for any 1D array
+def calculate_hamiltonian_array(array):
+    sum=0
+    for i in range(len(array)):
+        sum=sum+(array[i]*array[(i+1)%len(array)])
+    return sum
 
-    def recursive_magnitization(self, sublattice,depth):
-        if depth == len(self.dimensions)-1:
-            sum = self.calculate_array_magnitization(sublattice)
-            return sum
-        else:
-            sum = 0
-            for i in range(len(sublattice)):
-                sum = sum + self.recursive_magnitization(sublattice[i],depth+1)
-            return sum
+def calculate_lattice_magnitization(lattice):
+    depth = 0
+    return recursive_magnitization(lattice,lattice.lattice,depth)
 
-    # calculate the hamiltonian for any 1D array
-    def calculate_array_magnitization(self,array):
-        sum=0
-        for i in range(len(array)):
-            sum=sum+array[i]
+def recursive_magnitization(lattice, sublattice, depth):
+    if depth == len(lattice.dimensions)-1:
+        sum = calculate_array_magnitization(sublattice)
+        return sum
+    else:
+        sum = 0
+        for i in range(len(sublattice)):
+            sum = sum + recursive_magnitization(lattice,sublattice[i],depth+1)
         return sum
 
-    def delta_hamiltonian(self,position):
-        originalSum = 0
-        newSum = 0
-        positionValue = 0
-        exec "positionValue = " + getPositionStr(position)
-        newPositionValue = positionValue*(-1)
-        for i in range(len(position)):
-            maxLength = self.dimensions[i]
-            tempPosA = position
-            tempPosA[i] = (tempPosA[i] + 1)%maxLength
-            tempPosB = position
-            tempPosB[i] = (tempPosB[i] - 1)%maxLength
-            exec "oldSum += " + positionValue*(self.getPositionStr(tempPosA))
-            exec "oldSum += " + positionValue*(self.getPositionStr(tempPosB))
-            exec "newSum += " + newPositionValue*(self.getPositionStr(tempPosA))  
-            exec "newSum += " + newPositionValue*(self.getPositionStr(tempPosB))
-        return -1*(newSum - oldSum)
+# calculate the hamiltonian for any 1D array
+def calculate_array_magnitization(array):
+    sum=0
+    for i in range(len(array)):
+        sum=sum+array[i]
+    return sum
+
+def delta_hamiltonian(lattice,position):
+    originalSum = 0
+    newSum = 0
+    positionValue = 0
+    exec "positionValue = " + lattice.getPositionStr(position)
+    newPositionValue = positionValue*(-1)
+    for i in range(len(position)):
+        maxLength = lattice.dimensions[i]
+        tempPosA = position
+        tempPosA[i] = (tempPosA[i] + 1)%maxLength
+        tempPosB = position
+        tempPosB[i] = (tempPosB[i] - 1)%maxLength
+        exec "oldSum += " + positionValue*(lattice.getPositionStr(tempPosA))
+        exec "oldSum += " + positionValue*(lattice.getPositionStr(tempPosB))
+        exec "newSum += " + newPositionValue*(lattice.getPositionStr(tempPosA))  
+        exec "newSum += " + newPositionValue*(lattice.getPositionStr(tempPosB))
+    return -1*(newSum - oldSum)
 
 
 
@@ -144,8 +144,8 @@ def main():
         lattice.printLattice()
 
         # print calculate_hamiltonian_array([1,1,1,1,1])
-        H = lattice.calculate_hamiltonian_lattice()
-        print H
+        H = calculate_hamiltonian_lattice(lattice)
+        print "H: ",H
 
         temp = lattice.lattice
         exec "print " + getPos(temp,[1,1,1])
