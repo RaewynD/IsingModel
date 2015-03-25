@@ -1,0 +1,1100 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     41581,       1091]
+NotebookOptionsPosition[     40322,       1045]
+NotebookOutlinePosition[     40674,       1061]
+CellTagsIndexPosition[     40631,       1058]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["\<\
+Testing a ferromagnetic hexagonal lattice (each point has 6 neighbors instead \
+of 4)\
+\>", "Section",
+ CellChangeTimes->{{3.636282834249593*^9, 3.636282853585273*^9}}],
+
+Cell[TextData[{
+ "We can define the change in energy in terms of the neighbors. Now this is a \
+pain in ",
+ StyleBox["Mathematica",
+  FontSlant->"Italic"],
+ " because because it counts the first index of an array as 1 and not 0. So \
+if I want to use periodic boundary conditions and have first index-1=nth \
+index, I can\[CloseCurlyQuote]t do Mod[i-1,n], which returns 0 when i=1. \
+Instead, I need to do Mod[i-2,n]+1, which returns n-1+1=n. This will be \
+easier in python, but at least this way, I can make my picture make sense. "
+}], "Text",
+ CellChangeTimes->{{3.6362828266031227`*^9, 3.6362830785219307`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"ArrayPlot", "[", 
+  RowBox[{
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"1", ",", "1", ",", "0"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"1", ",", "2", ",", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"0", ",", "1", ",", "1"}], "}"}]}], "}"}], ",", 
+   RowBox[{"ColorRules", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"2", "\[Rule]", "Red"}], ",", 
+      RowBox[{"1", "\[Rule]", "Pink"}], ",", 
+      RowBox[{"0", "\[Rule]", "White"}]}], "}"}]}], ",", 
+   RowBox[{"Mesh", "\[Rule]", "True"}], ",", 
+   RowBox[{"MeshStyle", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"Black", ",", "Thick"}], "}"}]}]}], "]"}]], "Input",
+ CellChangeTimes->{{3.6362837198831587`*^9, 3.636283832757771*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{
+   RasterBox[{{{1., 1., 1.}, {1., 0.5, 0.5}, {1., 0.5, 0.5}}, {{1., 0.5, 
+    0.5}, {1., 0., 0.}, {1., 0.5, 0.5}}, {{1., 0.5, 0.5}, {1., 0.5, 0.5}, {1.,
+     1., 1.}}}, {{0, 0}, {3, 3}}, {0, 1}], {
+    {GrayLevel[0], 
+     StyleBox[
+      LineBox[{{{0, 3}, {3, 3}}, {{0, 2}, {3, 2}}, {{0, 1}, {3, 1}}, {{0, 
+       0}, {3, 0}}}],
+      Antialiasing->False]}, 
+    {Thickness[Large], 
+     StyleBox[
+      LineBox[{{{0, 0}, {0, 3}}, {{1, 0}, {1, 3}}, {{2, 0}, {2, 3}}, {{3, 
+       0}, {3, 3}}}],
+      Antialiasing->False]}}},
+  Frame->False,
+  FrameLabel->{None, None},
+  FrameTicks->{{None, None}, {None, None}},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{
+   "AxisPadding" -> Scaled[0.02], "DefaultBoundaryStyle" -> Automatic, 
+    "DefaultPlotStyle" -> Automatic, "DomainPadding" -> Scaled[0.02], 
+    "RangePadding" -> Scaled[0.05]}]], "Output",
+ CellChangeTimes->{{3.636283768395033*^9, 3.636283833199582*^9}}]
+}, Open  ]],
+
+Cell["\<\
+This is my \[OpenCurlyDoubleQuote]square hexagonal lattice.\
+\[CloseCurlyDoubleQuote] Cell (i,j) in red, is adjacent to cells (i-1,j-1), \
+(i-1,j), (i,j-1), (i,j+1), (i+1,j),(i+1,j+1) shown in pink. \
+\>", "Text",
+ CellChangeTimes->{{3.636283853555595*^9, 3.6362839673305492`*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"deltaEnergy", "[", 
+   RowBox[{"i_", ",", "j_", ",", "array_"}], "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"j", ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"j", "-", "2"}], ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], " ", 
+     RowBox[{"(*", 
+      RowBox[{"neighbors", " ", "in", " ", "same", " ", "row"}], " ", "*)"}], 
+     "+", "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"i", "-", "2"}], ",", "n"}], "]"}], "+", "1"}], ",", "j"}],
+        "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"i", "-", "2"}], ",", "n"}], "]"}], "+", "1"}], ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"j", "-", "2"}], ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], "+", " ", 
+     RowBox[{"(*", 
+      RowBox[{"neighbors", " ", "in", " ", "row", " ", "above"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"i", ",", "n"}], "]"}], "+", "1"}], ",", "j"}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"i", ",", "n"}], "]"}], "+", "1"}], ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"j", ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}]}], ")"}], " ", 
+   RowBox[{"(*", 
+    RowBox[{"neighbors", " ", "in", " ", "row", " ", "below"}], "*)"}], "-", 
+   RowBox[{"(", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"j", ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{"i", ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"j", "-", "2"}], ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{"(*", 
+      RowBox[{"neighbors", " ", "in", " ", "same", " ", "row"}], " ", "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"i", "-", "2"}], ",", "n"}], "]"}], "+", "1"}], ",", "j"}],
+        "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"i", "-", "2"}], ",", "n"}], "]"}], "+", "1"}], ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{
+           RowBox[{"j", "-", "2"}], ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{"(*", 
+      RowBox[{"neighbors", " ", "in", " ", "row", " ", "above"}], "*)"}], 
+     "\[IndentingNewLine]", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"i", ",", "n"}], "]"}], "+", "1"}], ",", "j"}], 
+       "\[RightDoubleBracket]"}]}], "+", 
+     RowBox[{
+      RowBox[{"(", 
+       RowBox[{
+        RowBox[{"array", "\[LeftDoubleBracket]", 
+         RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "/.", 
+        RowBox[{"{", 
+         RowBox[{
+          RowBox[{
+           RowBox[{"-", "1"}], "\[Rule]", "1"}], ",", 
+          RowBox[{"1", "\[Rule]", 
+           RowBox[{"-", "1"}]}]}], "}"}]}], ")"}], 
+      RowBox[{"array", "\[LeftDoubleBracket]", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"i", ",", "n"}], "]"}], "+", "1"}], ",", 
+        RowBox[{
+         RowBox[{"Mod", "[", 
+          RowBox[{"j", ",", "m"}], "]"}], "+", "1"}]}], 
+       "\[RightDoubleBracket]"}]}]}], " ", 
+    RowBox[{"(*", 
+     RowBox[{"neighbors", " ", "in", " ", "row", " ", "below"}], " ", "*)"}], 
+    ")"}]}]}]], "Input",
+ CellChangeTimes->{{3.63623751057872*^9, 3.6362378617759523`*^9}, {
+  3.636237945575067*^9, 3.636238107302526*^9}, {3.636238219666403*^9, 
+  3.6362382643116703`*^9}, {3.636239056372917*^9, 3.636239214464082*^9}, {
+  3.636240006901319*^9, 3.636240017818264*^9}}],
+
+Cell["\<\
+Now let\[CloseCurlyQuote]s test that this generally works as expected with a \
+small grid. This will still output a square plot, but the adjacency rules \
+have certain diagonals included. \
+\>", "Text",
+ CellChangeTimes->{{3.636238514155715*^9, 3.636238528449815*^9}, {
+   3.6362392384875517`*^9, 3.636239239557023*^9}, {3.6362392994291286`*^9, 
+   3.6362393002186747`*^9}, {3.6362394169272003`*^9, 3.636239418407113*^9}, {
+   3.636239583410041*^9, 3.636239588559752*^9}, {3.636240161377247*^9, 
+   3.636240161471559*^9}, {3.63624042706627*^9, 3.636240428048039*^9}, 
+   3.636282744907192*^9, {3.636283091503694*^9, 3.6362831073204823`*^9}, {
+   3.636283381620895*^9, 3.636283408891769*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"tmax", "=", "5"}], ";", " ", 
+   RowBox[{"(*", 
+    RowBox[{"Input", " ", "number", " ", "of", " ", "time", " ", "steps"}], 
+    " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"kT", "=", "1"}], ";", " ", 
+   RowBox[{"(*", 
+    RowBox[{"Input", " ", "temperature"}], " ", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{"n", "=", "4"}], ";", 
+   RowBox[{"m", "=", "4"}], ";"}], " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "Dimensions"}], " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fullDataTest", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"magnetizationTest", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"currentArray", "=", 
+   RowBox[{
+    RowBox[{"RandomInteger", "[", 
+     RowBox[{"1", ",", 
+      RowBox[{"{", 
+       RowBox[{"n", ",", "m"}], "}"}]}], "]"}], "/.", 
+    RowBox[{"{", 
+     RowBox[{"0", "\[Rule]", 
+      RowBox[{"-", "1"}]}], "}"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fullDataTest", "=", 
+   RowBox[{"Append", "[", 
+    RowBox[{"fullDataTest", ",", "currentArray"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"For", "[", 
+  RowBox[{
+   RowBox[{"t", "=", "1"}], ",", 
+   RowBox[{"t", "\[LessSlantEqual]", "tmax"}], ",", 
+   RowBox[{"t", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"j", "=", "1"}], ",", 
+      RowBox[{"j", "\[LessEqual]", "m"}], ",", 
+      RowBox[{"j", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      
+      RowBox[{"For", "[", 
+       RowBox[{
+        RowBox[{"i", "=", "1"}], ",", 
+        RowBox[{"i", "\[LessEqual]", "n"}], ",", 
+        RowBox[{"i", "++"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j"}], "}"}], "]"}], ";"}], "*)"}], 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], ";"}], "*)"}],
+         "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"RandomReal", "[", "]"}], "<", 
+            RowBox[{"\[ExponentialE]", "^", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"-", 
+                RowBox[{"deltaEnergy", "[", 
+                 RowBox[{"i", ",", "j", ",", "currentArray"}], "]"}]}], "/", 
+               "kT"}], ")"}]}]}], ",", 
+           RowBox[{"(*", 
+            RowBox[{
+             RowBox[{"Print", "[", "\"\<flip\>\"", "]"}], ";"}], " ", "*)"}], 
+           
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"-", 
+             RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+              RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], ",", 
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], "]"}], 
+         ";", "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], "*)"}], 
+         ";"}]}], "\[IndentingNewLine]", "]"}]}], "]"}], ";", 
+    "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    RowBox[{"(*", 
+     RowBox[{
+      RowBox[{
+      "Outside", " ", "of", " ", "our", " ", "inner", " ", "two", " ", 
+       "loops"}], ",", " ", 
+      RowBox[{
+      "we", " ", "add", " ", "the", " ", "current", " ", "array", " ", "to", 
+       " ", "our", " ", "list", " ", "of", " ", "full", " ", "data", " ", 
+       "and", " ", "the", " ", "sum", " ", "of", " ", "all", " ", "of", " ", 
+       "the", " ", "spins", " ", "to", " ", "our", " ", "list", " ", "of", 
+       " ", "the", " ", "magnetiziations"}]}], "*)"}], "\[IndentingNewLine]", 
+    
+    RowBox[{"fullDataTest", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"fullDataTest", ",", "currentArray"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"magnetizationTest", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"magnetizationTest", ",", 
+       RowBox[{"Total", "[", 
+        RowBox[{"Total", "[", "currentArray", "]"}], "]"}]}], "]"}]}], 
+    ";"}]}], "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Animate", "[", 
+   RowBox[{
+    RowBox[{"ArrayPlot", "[", 
+     RowBox[{
+      RowBox[{
+      "fullDataTest", "\[LeftDoubleBracket]", "k", "\[RightDoubleBracket]"}], 
+      ",", 
+      RowBox[{"ColorRules", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"1", "\[Rule]", "Red"}], ",", 
+         RowBox[{
+          RowBox[{"-", "1"}], "\[Rule]", "Blue"}]}], "}"}]}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", "1", ",", "tmax", ",", "1"}], "}"}]}], "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"magnetizationTest", ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"AxesLabel", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"\"\<time step\>\"", ",", "\"\<Magnetization\>\""}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.636238179516917*^9, 3.636238194665627*^9}, {
+  3.636238278973406*^9, 3.6362383414282227`*^9}, {3.6362384076617928`*^9, 
+  3.636238491005418*^9}, {3.6362385723790693`*^9, 3.636238581618183*^9}, {
+  3.636238690441133*^9, 3.636238709096796*^9}, {3.636238939202941*^9, 
+  3.636238959344104*^9}, {3.636239306517817*^9, 3.6362393071013727`*^9}, {
+  3.6362396008990803`*^9, 3.636239602152692*^9}, {3.636240318899313*^9, 
+  3.636240346436923*^9}, {3.6362403938183537`*^9, 3.636240403505742*^9}, {
+  3.636240437872909*^9, 3.636240527491522*^9}, {3.636240575033395*^9, 
+  3.63624059035955*^9}, {3.636240690965287*^9, 3.6362407051380053`*^9}, {
+  3.6362826298087177`*^9, 3.636282642524345*^9}, {3.636282725615897*^9, 
+  3.6362827629678583`*^9}, {3.636283133251998*^9, 3.636283196824182*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`k$$ = 1, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`k$$], 1, 5, 1}}, Typeset`size$$ = {
+    360., {177., 182.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`k$114051$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`k$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`k$$, $CellContext`k$114051$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> ArrayPlot[
+        Part[$CellContext`fullDataTest, $CellContext`k$$], 
+        ColorRules -> {1 -> Red, -1 -> Blue}], 
+      "Specifications" :> {{$CellContext`k$$, 1, 5, 1, 
+         AppearanceElements -> {
+          "ProgressSlider", "PlayPauseButton", "FasterSlowerButtons", 
+           "DirectionButton"}}}, 
+      "Options" :> {
+       ControlType -> Animator, AppearanceElements -> None, DefaultBaseStyle -> 
+        "Animate", DefaultLabelStyle -> "AnimateLabel", SynchronousUpdating -> 
+        True, ShrinkingDelay -> 10.}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {214., 220.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Animate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.636282763593401*^9, {3.636283188754644*^9, 3.63628319726733*^9}}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, 
+   {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.019444444444444445`], 
+    AbsoluteThickness[1.6], 
+    LineBox[{{1., -12.}, {2., -16.}, {3., -16.}, {4., -16.}, {
+     5., -16.}}]}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"time step\"", TraditionalForm], 
+    FormBox["\"Magnetization\"", TraditionalForm]},
+  AxesOrigin->{0, -11.8},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 5.}, {-16., -12.}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{
+  3.636282763593401*^9, {3.636283188754644*^9, 3.63628319736305*^9}}]
+}, Open  ]],
+
+Cell["\<\
+Great! Let\[CloseCurlyQuote]s do this in a bigger grid and a more interesting \
+set of temperatures. \
+\>", "Text",
+ CellChangeTimes->{{3.636283207453142*^9, 3.636283213307488*^9}, {
+  3.636283274050342*^9, 3.636283279401348*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"tmax", "=", "100"}], ";"}], " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "number", " ", "of", " ", "time", " ", "steps"}], 
+   " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kT", "=", "3"}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "temperature"}], " ", "*)"}], "\[IndentingNewLine]", 
+  
+  RowBox[{"n", "=", "20"}], ";", 
+  RowBox[{"m", "=", "20"}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "Dimensions"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"fullData", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"magnetization", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"currentArray", "=", 
+   RowBox[{
+    RowBox[{"RandomInteger", "[", 
+     RowBox[{"1", ",", 
+      RowBox[{"{", 
+       RowBox[{"n", ",", "m"}], "}"}]}], "]"}], "/.", 
+    RowBox[{"{", 
+     RowBox[{"0", "\[Rule]", 
+      RowBox[{"-", "1"}]}], "}"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fullData", "=", 
+   RowBox[{"Append", "[", 
+    RowBox[{"fullData", ",", "currentArray"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"For", "[", 
+  RowBox[{
+   RowBox[{"t", "=", "1"}], ",", 
+   RowBox[{"t", "\[LessSlantEqual]", "tmax"}], ",", 
+   RowBox[{"t", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"j", "=", "1"}], ",", 
+      RowBox[{"j", "\[LessEqual]", "m"}], ",", 
+      RowBox[{"j", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      
+      RowBox[{"For", "[", 
+       RowBox[{
+        RowBox[{"i", "=", "1"}], ",", 
+        RowBox[{"i", "\[LessEqual]", "n"}], ",", 
+        RowBox[{"i", "++"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j"}], "}"}], "]"}], ";"}], "*)"}], 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], ";"}], "*)"}],
+         "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"RandomReal", "[", "]"}], "<", 
+            RowBox[{"\[ExponentialE]", "^", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"-", 
+                RowBox[{"deltaEnergy", "[", 
+                 RowBox[{"i", ",", "j", ",", "currentArray"}], "]"}]}], "/", 
+               "kT"}], ")"}]}]}], ",", 
+           RowBox[{"(*", 
+            RowBox[{
+             RowBox[{"Print", "[", "\"\<flip\>\"", "]"}], ";"}], " ", "*)"}], 
+           
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"-", 
+             RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+              RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], ",", 
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], "]"}], 
+         ";", "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], "*)"}], 
+         ";"}]}], "\[IndentingNewLine]", "]"}]}], "]"}], ";", 
+    "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    RowBox[{"(*", 
+     RowBox[{
+      RowBox[{
+      "Outside", " ", "of", " ", "our", " ", "inner", " ", "two", " ", 
+       "loops"}], ",", " ", 
+      RowBox[{
+      "we", " ", "add", " ", "the", " ", "current", " ", "array", " ", "to", 
+       " ", "our", " ", "list", " ", "of", " ", "full", " ", "data", " ", 
+       "and", " ", "the", " ", "sum", " ", "of", " ", "all", " ", "of", " ", 
+       "the", " ", "spins", " ", "to", " ", "our", " ", "list", " ", "of", 
+       " ", "the", " ", "magnetiziations"}]}], "*)"}], "\[IndentingNewLine]", 
+    
+    RowBox[{"fullData", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"fullData", ",", "currentArray"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"magnetization", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"magnetization", ",", 
+       RowBox[{"Total", "[", 
+        RowBox[{"Total", "[", "currentArray", "]"}], "]"}]}], "]"}]}], 
+    ";"}]}], "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Animate", "[", 
+   RowBox[{
+    RowBox[{"ArrayPlot", "[", 
+     RowBox[{
+      RowBox[{
+      "fullData", "\[LeftDoubleBracket]", "k", "\[RightDoubleBracket]"}], ",", 
+      RowBox[{"ColorRules", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"1", "\[Rule]", "Red"}], ",", 
+         RowBox[{
+          RowBox[{"-", "1"}], "\[Rule]", "Blue"}]}], "}"}]}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", "1", ",", "tmax", ",", "1"}], "}"}]}], "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"magnetization", ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"AxesLabel", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"\"\<time step\>\"", ",", "\"\<Magnetization\>\""}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.6362832268965073`*^9, 3.636283297058988*^9}, {
+  3.636283340571504*^9, 3.636283340689183*^9}, {3.636283592876854*^9, 
+  3.6362835929527197`*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`k$$ = 62, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`k$$], 1, 100, 1}}, Typeset`size$$ = {
+    360., {177., 182.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`k$142378$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`k$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`k$$, $CellContext`k$142378$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> ArrayPlot[
+        Part[$CellContext`fullData, $CellContext`k$$], 
+        ColorRules -> {1 -> Red, -1 -> Blue}], 
+      "Specifications" :> {{$CellContext`k$$, 1, 100, 1, 
+         AppearanceElements -> {
+          "ProgressSlider", "PlayPauseButton", "FasterSlowerButtons", 
+           "DirectionButton"}}}, 
+      "Options" :> {
+       ControlType -> Animator, AppearanceElements -> None, DefaultBaseStyle -> 
+        "Animate", DefaultLabelStyle -> "AnimateLabel", SynchronousUpdating -> 
+        True, ShrinkingDelay -> 10.}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {214., 220.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Animate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{
+  3.636283221326523*^9, 3.636283253592594*^9, {3.6362832891922626`*^9, 
+   3.636283300535968*^9}, 3.6362833438760843`*^9, 3.636283596600277*^9}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, 
+   {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.01388888888888889], 
+    AbsoluteThickness[1.6], LineBox[CompressedData["
+1:eJxdk8tKA0EQRRtXLl24cOEiioiIiO+3ptXEV4zJ5KnoIogiLiS+UJf1KfmU
+/hQ/wU9QqXsHqgLJcHK6qm73zEzc9hv3QyGEu7/v/1U/P0W93iT8EfW3Bx5W
+DtfgEfg78Cj8A3jM8bhyegQX4J/Ak8ryDJ6CfwFPw7+CZ5R7b+BZ5+dQ/w6e
+R16uX0A91y8iXx+8BM/5y/Bcv4L+H+BV5QJ5DXk+wevoR95wfhP1X+At57cd
+7yAPeRd5yHvK38xTdD7CgwU84Px9m0fAQn+AfvTgSH+ozP0KOHJ+ybKUbL9Q
+xjz6sst/pJywPyHTH7t6MvufuPyOw6kyz0PAPfozV0/m/IqdJxWbN5wrF5gP
+zPsRqq5/1fkL1NOD8/Otuf41V1+3PoLz++U41V3+DPtjfebyZDZ/ymy/0MB6
+9Itgnp80bN5Ez/Nv2jyx6fKDeR7J+dACo18E832Rlt1farn5bczn/ts2r4AH
+rHccOnZe7FgvHZef61nfVeZ5x67NJ45T1+YNl3Z/Ecz3V8C8PwmcP99Xeb5f
+VvLooQ==
+     "]]}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"time step\"", TraditionalForm], 
+    FormBox["\"Magnetization\"", TraditionalForm]},
+  AxesOrigin->{0, -189.25000000000006`},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {-394., -199.}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{
+  3.636283221326523*^9, 3.636283253592594*^9, {3.6362832891922626`*^9, 
+   3.636283300535968*^9}, 3.6362833438760843`*^9, 3.6362835967015038`*^9}]
+}, Open  ]],
+
+Cell["\<\
+Running this, it looks like the criticle temperature is higher than for the \
+regular flat grid. Neat. \
+\>", "Text",
+ CellChangeTimes->{{3.636283311152866*^9, 3.636283360685589*^9}, {
+  3.636283444306045*^9, 3.6362834449619827`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Anti-ferro magnetic triangular lattice", "Section",
+ CellChangeTimes->{{3.636283448081712*^9, 3.636283457521412*^9}}],
+
+Cell["\<\
+All we need to do is change the sign of the change in energy. Equivalently, \
+we can swap out e^(-delta energy/kT) for e^(+delta energy/kT). \
+\>", "Text",
+ CellChangeTimes->{{3.6362834697288637`*^9, 3.636283516242313*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"tmax", "=", "100"}], ";"}], " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "number", " ", "of", " ", "time", " ", "steps"}], 
+   " ", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"kT", "=", "2"}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "temperature"}], " ", "*)"}], "\[IndentingNewLine]", 
+  
+  RowBox[{"n", "=", "20"}], ";", 
+  RowBox[{"m", "=", "20"}], ";", " ", 
+  RowBox[{"(*", 
+   RowBox[{"Input", " ", "Dimensions"}], " ", "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"fullDataAnti", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"magnetizationAnti", "=", 
+   RowBox[{"{", "}"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"currentArray", "=", 
+   RowBox[{
+    RowBox[{"RandomInteger", "[", 
+     RowBox[{"1", ",", 
+      RowBox[{"{", 
+       RowBox[{"n", ",", "m"}], "}"}]}], "]"}], "/.", 
+    RowBox[{"{", 
+     RowBox[{"0", "\[Rule]", 
+      RowBox[{"-", "1"}]}], "}"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"fullDataAnti", "=", 
+   RowBox[{"Append", "[", 
+    RowBox[{"fullDataAnti", ",", "currentArray"}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"For", "[", 
+  RowBox[{
+   RowBox[{"t", "=", "1"}], ",", 
+   RowBox[{"t", "\[LessSlantEqual]", "tmax"}], ",", 
+   RowBox[{"t", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"For", "[", 
+     RowBox[{
+      RowBox[{"j", "=", "1"}], ",", 
+      RowBox[{"j", "\[LessEqual]", "m"}], ",", 
+      RowBox[{"j", "++"}], ",", "\[IndentingNewLine]", "\[IndentingNewLine]", 
+      
+      RowBox[{"For", "[", 
+       RowBox[{
+        RowBox[{"i", "=", "1"}], ",", 
+        RowBox[{"i", "\[LessEqual]", "n"}], ",", 
+        RowBox[{"i", "++"}], ",", "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"{", 
+            RowBox[{"i", ",", "j"}], "}"}], "]"}], ";"}], "*)"}], 
+        "\[IndentingNewLine]", 
+        RowBox[{"(*", 
+         RowBox[{
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], ";"}], "*)"}],
+         "\[IndentingNewLine]", 
+        RowBox[{
+         RowBox[{"If", "[", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"RandomReal", "[", "]"}], "<", 
+            RowBox[{"\[ExponentialE]", "^", 
+             RowBox[{"(", 
+              RowBox[{
+               RowBox[{"deltaEnergy", "[", 
+                RowBox[{"i", ",", "j", ",", "currentArray"}], "]"}], "/", 
+               "kT"}], ")"}]}]}], ",", 
+           RowBox[{"(*", 
+            RowBox[{
+             RowBox[{"Print", "[", "\"\<flip\>\"", "]"}], ";"}], " ", "*)"}], 
+           
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"-", 
+             RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+              RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], ",", 
+           RowBox[{
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}], "=", 
+            RowBox[{"currentArray", "\[LeftDoubleBracket]", 
+             RowBox[{"i", ",", "j"}], "\[RightDoubleBracket]"}]}]}], "]"}], 
+         ";", "\[IndentingNewLine]", 
+         RowBox[{"(*", 
+          RowBox[{"Print", "[", 
+           RowBox[{"currentArray", "//", "MatrixForm"}], "]"}], "*)"}], 
+         ";"}]}], "\[IndentingNewLine]", "]"}]}], "]"}], ";", 
+    "\[IndentingNewLine]", "\[IndentingNewLine]", 
+    RowBox[{"(*", 
+     RowBox[{
+      RowBox[{
+      "Outside", " ", "of", " ", "our", " ", "inner", " ", "two", " ", 
+       "loops"}], ",", " ", 
+      RowBox[{
+      "we", " ", "add", " ", "the", " ", "current", " ", "array", " ", "to", 
+       " ", "our", " ", "list", " ", "of", " ", "full", " ", "data", " ", 
+       "and", " ", "the", " ", "sum", " ", "of", " ", "all", " ", "of", " ", 
+       "the", " ", "spins", " ", "to", " ", "our", " ", "list", " ", "of", 
+       " ", "the", " ", "magnetiziations"}]}], "*)"}], "\[IndentingNewLine]", 
+    
+    RowBox[{"fullDataAnti", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"fullDataAnti", ",", "currentArray"}], "]"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"magnetizationAnti", "=", 
+     RowBox[{"Append", "[", 
+      RowBox[{"magnetizationAnti", ",", 
+       RowBox[{"Total", "[", 
+        RowBox[{"Total", "[", "currentArray", "]"}], "]"}]}], "]"}]}], 
+    ";"}]}], "\[IndentingNewLine]", "]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Animate", "[", 
+   RowBox[{
+    RowBox[{"ArrayPlot", "[", 
+     RowBox[{
+      RowBox[{
+      "fullDataAnti", "\[LeftDoubleBracket]", "k", "\[RightDoubleBracket]"}], 
+      ",", 
+      RowBox[{"ColorRules", "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"1", "\[Rule]", "Red"}], ",", 
+         RowBox[{
+          RowBox[{"-", "1"}], "\[Rule]", "Blue"}]}], "}"}]}]}], "]"}], ",", 
+    RowBox[{"{", 
+     RowBox[{"k", ",", "1", ",", "tmax", ",", "1"}], "}"}]}], "]"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{"ListPlot", "[", 
+  RowBox[{"magnetizationAnti", ",", 
+   RowBox[{"Joined", "\[Rule]", "True"}], ",", 
+   RowBox[{"AxesLabel", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"\"\<time step\>\"", ",", "\"\<Magnetization\>\""}], "}"}]}]}], 
+  "]"}]}], "Input",
+ CellChangeTimes->{{3.636283525869323*^9, 3.6362836246655693`*^9}, {
+  3.6362836658366327`*^9, 3.636283665892544*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  StyleBox[
+   DynamicModuleBox[{$CellContext`k$$ = 2, Typeset`show$$ = True, 
+    Typeset`bookmarkList$$ = {}, Typeset`bookmarkMode$$ = "Menu", 
+    Typeset`animator$$, Typeset`animvar$$ = 1, Typeset`name$$ = 
+    "\"untitled\"", Typeset`specs$$ = {{
+      Hold[$CellContext`k$$], 1, 100, 1}}, Typeset`size$$ = {
+    360., {177., 182.}}, Typeset`update$$ = 0, Typeset`initDone$$, 
+    Typeset`skipInitDone$$ = True, $CellContext`k$167006$$ = 0}, 
+    DynamicBox[Manipulate`ManipulateBoxes[
+     1, StandardForm, "Variables" :> {$CellContext`k$$ = 1}, 
+      "ControllerVariables" :> {
+        Hold[$CellContext`k$$, $CellContext`k$167006$$, 0]}, 
+      "OtherVariables" :> {
+       Typeset`show$$, Typeset`bookmarkList$$, Typeset`bookmarkMode$$, 
+        Typeset`animator$$, Typeset`animvar$$, Typeset`name$$, 
+        Typeset`specs$$, Typeset`size$$, Typeset`update$$, Typeset`initDone$$,
+         Typeset`skipInitDone$$}, "Body" :> ArrayPlot[
+        Part[$CellContext`fullDataAnti, $CellContext`k$$], 
+        ColorRules -> {1 -> Red, -1 -> Blue}], 
+      "Specifications" :> {{$CellContext`k$$, 1, 100, 1, 
+         AppearanceElements -> {
+          "ProgressSlider", "PlayPauseButton", "FasterSlowerButtons", 
+           "DirectionButton"}}}, 
+      "Options" :> {
+       ControlType -> Animator, AppearanceElements -> None, DefaultBaseStyle -> 
+        "Animate", DefaultLabelStyle -> "AnimateLabel", SynchronousUpdating -> 
+        True, ShrinkingDelay -> 10.}, "DefaultOptions" :> {}],
+     ImageSizeCache->{405., {214., 220.}},
+     SingleEvaluation->True],
+    Deinitialization:>None,
+    DynamicModuleValues:>{},
+    SynchronousInitialization->True,
+    UnsavedVariables:>{Typeset`initDone$$},
+    UntrackedVariables:>{Typeset`size$$}], "Animate",
+   Deployed->True,
+   StripOnInput->False],
+  Manipulate`InterpretManipulate[1]]], "Output",
+ CellChangeTimes->{{3.636283583138035*^9, 3.636283629802053*^9}, 
+   3.636283670913617*^9}],
+
+Cell[BoxData[
+ GraphicsBox[{{}, 
+   {RGBColor[0.368417, 0.506779, 0.709798], PointSize[0.01388888888888889], 
+    AbsoluteThickness[1.6], LineBox[CompressedData["
+1:eJxdkzlOgzEQhS0qSgoKCgpAEYoQQiHsa8y+hS3sLYKaK/hoPlKOAMjvs+Rn
+KRp9ebN5xv/858/oeyKE8PX3+7fljAfFbkb9IdvJxU6KZ2Sn8JM+bXH4zcnO
+wrn9H7tAnPSO5V+0ul3zX7K6y/hLXxH3ZXv4SV+Nbd2+6WuWf914w5g5Un/L
+8m9b/h0x99qV5ewZ71v+A4s/pJ70AfGysc2XYPIdwcUmmPsdmw6zr5OWE8z+
+T2HFw13pZ2LtKcHM69x0mPwX1C8nwbyXS+sfJv4Kf+mVpV+TXzrM/G5MNw5D
+uPinoem3bb0E873cyWq/CSb+XlbzTDDv/qGNj7DeT6pc9AxT/xFWPMx9Yc0j
+w7yfEax4mHhY9bL5h6e23wgzD9MzzH6eW44w+4bVT4Z5ny9ifccR7qk+rJNh
++n+1+sYJ5v4w8W9tvxFmfpVV3/TwTn7Vh9l/5aJnmPiP2t8vWE6C1g==
+     "]]}, {}},
+  AspectRatio->NCache[GoldenRatio^(-1), 0.6180339887498948],
+  Axes->{True, True},
+  AxesLabel->{
+    FormBox["\"time step\"", TraditionalForm], 
+    FormBox["\"Magnetization\"", TraditionalForm]},
+  AxesOrigin->{0, 0},
+  DisplayFunction->Identity,
+  Frame->{{False, False}, {False, False}},
+  FrameLabel->{{None, None}, {None, None}},
+  FrameTicks->{{Automatic, Automatic}, {Automatic, Automatic}},
+  GridLines->{None, None},
+  GridLinesStyle->Directive[
+    GrayLevel[0.5, 0.4]],
+  Method->{},
+  PlotRange->{{0., 100.}, {-16., 24.}},
+  PlotRangeClipping->True,
+  PlotRangePadding->{{
+     Scaled[0.02], 
+     Scaled[0.02]}, {
+     Scaled[0.05], 
+     Scaled[0.05]}},
+  Ticks->{Automatic, Automatic}]], "Output",
+ CellChangeTimes->{{3.636283583138035*^9, 3.636283629802053*^9}, 
+   3.6362836710019093`*^9}]
+}, Open  ]],
+
+Cell["\<\
+This just oscillates about a magnetism of zero. I think if I watch it for too \
+long, it\[CloseCurlyQuote]ll give me a headache. \
+\>", "Text",
+ CellChangeTimes->{{3.6362836402377157`*^9, 3.636283662248107*^9}}]
+}, Open  ]]
+},
+WindowSize->{808, 612},
+WindowMargins->{{4, Automatic}, {Automatic, 4}},
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (June 27, \
+2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 178, 4, 99, "Section"],
+Cell[761, 28, 616, 11, 87, "Text"],
+Cell[CellGroupData[{
+Cell[1402, 43, 762, 21, 46, "Input"],
+Cell[2167, 66, 968, 24, 374, "Output"]
+}, Open  ]],
+Cell[3150, 93, 291, 5, 49, "Text"],
+Cell[3444, 100, 7446, 206, 284, "Input"],
+Cell[10893, 308, 701, 11, 49, "Text"],
+Cell[CellGroupData[{
+Cell[11619, 323, 6254, 152, 488, "Input"],
+Cell[17876, 477, 1961, 40, 451, "Output"],
+Cell[19840, 519, 1034, 29, 211, "Output"]
+}, Open  ]],
+Cell[20889, 551, 240, 5, 30, "Text"],
+Cell[CellGroupData[{
+Cell[21154, 560, 5571, 144, 488, "Input"],
+Cell[26728, 706, 2037, 41, 451, "Output"],
+Cell[28768, 749, 1641, 39, 214, "Output"]
+}, Open  ]],
+Cell[30424, 791, 244, 5, 30, "Text"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[30705, 801, 123, 1, 64, "Section"],
+Cell[30831, 804, 233, 4, 49, "Text"],
+Cell[CellGroupData[{
+Cell[31089, 812, 5536, 143, 488, "Input"],
+Cell[36628, 957, 1967, 40, 451, "Output"],
+Cell[38598, 999, 1472, 36, 211, "Output"]
+}, Open  ]],
+Cell[40085, 1038, 221, 4, 30, "Text"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
