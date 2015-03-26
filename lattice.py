@@ -46,8 +46,51 @@ class Lattice:
             temp = temp + "[" + str(i) + "]"
         return temp
 
-    def updatePositionVal(self, position):
+    #flips the value at a given position
+    def flipPositionValue(self, position):
         exec self.getPositionStr(position) + " = " + self.getPositionStr(position) + "*(-1)"
+
+
+    #returns a list of positions that are neighbors of the 
+    #given postion
+    def getNeighbors(self, position):
+        neighbors = list()
+        for coord  in position:
+            
+            neighborPositionA = position
+            neighborPositionA[coord] = position[coord] + 1
+
+            neighborPositionB = position
+            neighborPositionB[coord] = position[coord] - 1
+            
+            neighbors.append(neighborPositionA)
+            neighbors.append(neighborsPositionB)
+
+        return neighbors
+
+    #gets value (-1 or +1) from lattice for a given position
+    def getValue(position):
+        exec "return " + self.getPositionStr(position)
+
+    #pass in a function and a closure and this method will
+    #perform the function on every member of the lattice
+    def mapLattice(self, lattice, func, closure):
+        depth = 0
+        position =  [0 for i in self.dimensions]
+        self.recursiveMapHelper(func, closure, self.lattice, self.lattice, depth, position)
+
+    def recursiveMapHelper(func, closure, lattice, sublattice, depth, position):
+        if depth == len(self.dimensions)-1:
+            for i in range(len(sublattice)):
+                newPos = position
+                newPos[depth] = i
+                func(lattice, newPos, closure)
+        else:
+            for i in range(len(sublattice)):
+                newPos = position
+                newPos[depth] = i
+                recursiveMapHelper(func, closure, lattice, sublattice[i], depth+1, newPos)
+
 
     # print object Lattice
     def printLattice(self):
@@ -126,7 +169,7 @@ def getPos(thing, position):
 
 def posFlipTest(lattice, position):
     if random.random() < math.exp(-lattice.delta_hamiltonian(position)/lattice.kt):
-        lattice.updatePostion(position)
+        lattice.updatePosition(position)
 
 def main():
         if len(sys.argv) < 3:
