@@ -40,7 +40,7 @@ class Lattice:
             for i in xrange(0,currentDimension):
                 array.append(self.recursive_allocator(depth+1))
             return array
-        
+
     def getPositionStr(self, position):
         temp = "self.lattice"
         for i in position:
@@ -55,7 +55,7 @@ class Lattice:
         exec self.getPositionStr(position) + " = newVal"
 
 
-    #returns a list of positions that are neighbors of the 
+    #returns a list of positions that are neighbors of the
     #given postion
     def getNeighbors(self, position):
         neighbors = list()
@@ -63,18 +63,18 @@ class Lattice:
             maxLen = self.dimensions[i]
 
             neighborPositionA = position[:]
-            print "nA: ", neighborPositionA
+#            print "nA: ", neighborPositionA
             neighborPositionA[i] = (position[i] + 1)%maxLen
-            print "nA: ", neighborPositionA
+#            print "nA: ", neighborPositionA
 
             neighborPositionB = position[:]
-            print "nB: ", neighborPositionB
+#            print "nB: ", neighborPositionB
             neighborPositionB[i] = (position[i] - 1)%maxLen
-            print "nB: ", neighborPositionB
-            
+#            print "nB: ", neighborPositionB
+
             neighbors.append(neighborPositionA)
             neighbors.append(neighborPositionB)
-            print "neighbors ", neighbors
+#            print "neighbors ", neighbors
 
         return neighbors
 
@@ -101,7 +101,7 @@ class Lattice:
             for i in range(len(sublattice)):
                 newPos = position
                 newPos[depth] = i
-                recursiveMapHelper(func, closure, sublattice[i], depth+1, newPos)
+                self.recursiveMapHelper(func, closure, sublattice[i], depth+1, newPos)
 
 
     # print object Lattice
@@ -177,14 +177,14 @@ def getPos(thing, position):
         return temp
 
 def posFlipTest(lattice, position, closure):
-    if random.random() < math.exp(-lattice.delta_hamiltonian(position)/lattice.kt):
+    if random.random() < math.exp(delta_hamiltonian(lattice, position)/lattice.kt):
         lattice.flipPositionValue(position)
 
 def make2(lattice, pos, closure):
-    lattice.updatePositionValue(pos, 2)
+    lattice.updatePositionValue(pos, 4)
 
 def updateLattice(lattice):
-    lattice.mapLattice(lattice, None)
+    lattice.mapLattice(posFlipTest, None)
 
 def main():
         if len(sys.argv) < 3:
@@ -192,7 +192,7 @@ def main():
                 exit(0)
 
         time = sys.argv[1]
-        kt = sys.argv[2]
+        kt = float(sys.argv[2])
         dims = []
         for i in range(3, len(sys.argv)):
             dims.append(int(sys.argv[i]))
@@ -206,6 +206,9 @@ def main():
 	print "H: ", delta_hamiltonian(lattice,[1,1,2])
 	print "Latt: ", updateLattice(lattice)
 
+        for i in range(100):
+                updateLattice(lattice)
+                print lattice.lattice
         exit(1)
 
 
