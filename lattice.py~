@@ -8,11 +8,12 @@ python isingmModel.py [TEMPURATURE] [DIM1] [DIM2]...
 
 class Lattice:
 
-    def __init__(self, kt, dims):
+    def __init__(self, name, kt, dims):
         #initialize global variables
         self.dimensions = dims
         self.kt = kt
         self.lattice = self.recursive_allocator(0)
+	self.name = name
 
     # This recursive code is accreditted to:
     # http://www.holehouse.org/programming/creating-n-dimensional-arrays-in-python/
@@ -50,54 +51,67 @@ class Lattice:
     def flipPositionValue(self, position):
         exec self.getPositionStr(position) + " = " + self.getPositionStr(position) + "*(-1)"
 
+    def updatePositionValue(self, position, newVal):
+        exec self.getPositionStr(position) + " = newVal"
+
 
     #returns a list of positions that are neighbors of the 
     #given postion
     def getNeighbors(self, position):
         neighbors = list()
-        for coord  in position:
-            
-            neighborPositionA = position
-            neighborPositionA[coord] = position[coord] + 1
+        for i in range(len(position)):
+            maxLen = self.dimensions[i]
 
-            neighborPositionB = position
-            neighborPositionB[coord] = position[coord] - 1
+            neighborPositionA = position[:]
+            print "nA: ", neighborPositionA
+            neighborPositionA[i] = (position[i] + 1)%maxLen
+            print "nA: ", neighborPositionA
+
+            neighborPositionB = position[:]
+            print "nB: ", neighborPositionB
+            neighborPositionB[i] = (position[i] - 1)%maxLen
+            print "nB: ", neighborPositionB
             
             neighbors.append(neighborPositionA)
-            neighbors.append(neighborsPositionB)
+            neighbors.append(neighborPositionB)
+            print "neighbors ", neighbors
 
         return neighbors
 
     #gets value (-1 or +1) from lattice for a given position
-    def getValue(position):
-        exec "return " + self.getPositionStr(position)
+    def getValue(self,position):
+	val = 0
+	exec "val = " + self.getPositionStr(position)
+        return val
 
     #pass in a function and a closure and this method will
     #perform the function on every member of the lattice
-    def mapLattice(self, lattice, func, closure):
+    def mapLattice(self, func, closure):
         depth = 0
         position =  [0 for i in self.dimensions]
-        self.recursiveMapHelper(func, closure, self.lattice, self.lattice, depth, position)
+        self.recursiveMapHelper(func, closure, self.lattice, depth, position)
 
-    def recursiveMapHelper(func, closure, lattice, sublattice, depth, position):
+    def recursiveMapHelper(self, func, closure, sublattice, depth, position):
         if depth == len(self.dimensions)-1:
             for i in range(len(sublattice)):
                 newPos = position
                 newPos[depth] = i
-                func(lattice, newPos, closure)
+                func(self, newPos, closure)
         else:
             for i in range(len(sublattice)):
                 newPos = position
                 newPos[depth] = i
-                recursiveMapHelper(func, closure, lattice, sublattice[i], depth+1, newPos)
+                recursiveMapHelper(func, closure, sublattice[i], depth+1, newPos)
 
 
     # print object Lattice
     def printLattice(self):
+	print "name: ", self.name
         print "kt: ", self.kt
         print "dims: ", self.dimensions
         print "lattice: ", self.lattice
 
+# calcluate hamiltonian for lattice
 def calculate_hamiltonian_lattice(lattice):
     depth = 0
     return recursive_hamiltonian(lattice,lattice.lattice,depth)
@@ -119,6 +133,7 @@ def calculate_hamiltonian_array(array):
         sum=sum+(array[i]*array[(i+1)%len(array)])
     return sum
 
+# calculate magnitization for lattice
 def calculate_lattice_magnitization(lattice):
     depth = 0
     return recursive_magnitization(lattice,lattice.lattice,depth)
@@ -141,22 +156,15 @@ def calculate_array_magnitization(array):
     return sum
 
 def delta_hamiltonian(lattice,position):
-    originalSum = 0
+
     newSum = 0
     oldSum = 0
-    positionValue = 0
-    exec "positionValue = " + lattice.getPositionStr(position)
-    newPositionValue = positionValue*(-1)
-    for i in range(len(position)):
-        maxLength = lattice.dimensions[i]
-        tempPosA = position
-        tempPosA[i] = (tempPosA[i] + 1)%maxLength
-        tempPosB = position
-        tempPosB[i] = (tempPosB[i] - 1)%maxLength
-        exec "oldSum += " + positionValue*(lattice.getPositionStr(tempPosA))
-        exec "oldSum += " + positionValue*(lattice.getPositionStr(tempPosB))
-        exec "newSum += " + newPositionValue*(lattice.getPositionStr(tempPosA))  
-        exec "newSum += " + newPositionValue*(lattice.getPositionStr(tempPosB))
+    positionValue = lattice.getValue(position)
+    newPositionValue = -1*positionValue
+    neighbors = lattice.getNeighbors(position)
+    for i in neighbors:
+        oldSum += positionValue*lattice.getValue(i)
+	newSum += newPositionValue*lattice.getValue(i)
     return -1*(newSum - oldSum)
 
 
@@ -170,31 +178,32 @@ def getPos(thing, position):
 
 def posFlipTest(lattice, position):
     if random.random() < math.exp(-lattice.delta_hamiltonian(position)/lattice.kt):
-        lattice.updatePosition(position)
+        lattice.flipPositionValue(position)
+
+def make2(lattice, pos, closure):
+    lattice.updatePositionValue(pos, 2)
+
+def updateLattice(lattice):
+    lattice.mapLattice(lattice, None)
 
 def main():
         if len(sys.argv) < 3:
                 print "Exception: Too few arguments"
                 exit(0)
 
-        kt = sys.argv[1]
+        time = sys.argv[1]
+        kt = sys.argv[2]
         dims = []
-        for i in range(2, len(sys.argv)):
-                dims.append(int(sys.argv[i]))
+        for i in range(3, len(sys.argv)):
+            dims.append(int(sys.argv[i]))
 
         print dims
 
-        lattice = Lattice(kt, dims)
+        lattice = Lattice("lattice", kt, dims)
         lattice.printLattice()
 
-        # print calculate_hamiltonian_array([1,1,1,1,1])
-        H = calculate_hamiltonian_lattice(lattice)
-        print "H: ",H
-
-        temp = lattice.lattice
-        exec "print " + getPos(temp,[1,1,1])
-        exec (getPos(temp,[1,1,1]) + "= 5")
-        exec "print " + getPos(temp,[1,1,1])
+	print "neighbors: ", lattice.getNeighbors([1,1,2])
+	print "H: ", delta_hamiltonian(lattice,[1,1,2])
 
         exit(1)
 
