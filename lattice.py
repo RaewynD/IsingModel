@@ -50,6 +50,9 @@ class Lattice:
     #flips the value at a given position
     def flipPositionValue(self, position):
         exec self.getPositionStr(position) + " = " + self.getPositionStr(position) + "*(-1)"
+        return self.getValue(position)
+
+
 
     def updatePositionValue(self, position, newVal):
         exec self.getPositionStr(position) + " = newVal"
@@ -206,7 +209,7 @@ def main():
 	print "H: ", delta_hamiltonian(lattice,[1,1,2])
 	print "Latt: ", updateLattice(lattice)
 
-        for i in range(100):
+        for i in range(10000):
                 updateLattice(lattice)
                 print lattice.lattice
         exit(1)
