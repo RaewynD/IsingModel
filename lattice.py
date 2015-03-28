@@ -176,7 +176,7 @@ def getPos(thing, position):
             temp = temp + "[" + str(i) + "]"
         return temp
 
-def posFlipTest(lattice, position):
+def posFlipTest(lattice, position, closure):
     if random.random() < math.exp(-lattice.delta_hamiltonian(position)/lattice.kt):
         lattice.flipPositionValue(position)
 

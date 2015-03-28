@@ -204,6 +204,7 @@ def main():
 
 	print "neighbors: ", lattice.getNeighbors([1,1,2])
 	print "H: ", delta_hamiltonian(lattice,[1,1,2])
+	print "Latt: ", updateLattice(lattice)
 
         exit(1)
 
