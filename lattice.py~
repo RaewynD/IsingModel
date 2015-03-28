@@ -53,7 +53,6 @@ class Lattice:
 
     #returns a list of positions that are neighbors of the 
     #given postion
-    #TODO: edge case wrap around
     def getNeighbors(self, position):
         neighbors = list()
         for coord  in position:
