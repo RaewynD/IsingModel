@@ -22,7 +22,7 @@ def wolffDFS(lat, start):
         visited, flipList = set(), [tuple(start)]
         delta_H = 0
         while flipList:
-#                print "fliplist \n", flipList
+                #note: conversion to tuple from list is made for hashing
                 pos = tuple(flipList.pop())
                 if pos not in visited:
                         neighbors = lat.getNeighbors(list(pos))
