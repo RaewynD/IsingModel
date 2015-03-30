@@ -1,4 +1,5 @@
-import lattice, os, sys, io, random, math
+import lattice, os, sys, io, random, math, copy
+from scipy.io import savemat
 from lattice import Lattice
 
 def runWolff(lat):
@@ -64,10 +65,18 @@ def main():
 
         lat = Lattice("lattice", kt, dims)
         lat.printLattice()
+        initiallattice=copy.deepcopy(lat.lattice)
+        #Make a copy that can be outputted
 
         for i in range(10000):
                 runWolff(lat)
                 print lat.lattice
+        finallattice=copy.deepcopy(lat.lattice)
+        #make a copy that can be outputted
+
+        #output initial and final grids. 
+        savemat('initial.mat',{'Initial':initiallattice})
+        savemat('final.mat',{'final':finallattice})
 
 if __name__ == "__main__":
         exit(main())
