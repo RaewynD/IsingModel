@@ -13,7 +13,7 @@ class Lattice:
         self.dimensions = dims
         self.kt = kt
         self.lattice = self.recursive_allocator(0)
-	self.name = name
+	    self.name = name
 
     # This recursive code is accreditted to:
     # http://www.holehouse.org/programming/creating-n-dimensional-arrays-in-python/
@@ -25,9 +25,7 @@ class Lattice:
             currentDimension = self.dimensions[depth]
             array = []
             for i in xrange(0,currentDimension):
-#               TODO: return to random!!!
                 array.append(random.choice([-1,1]))
-#               array.append(1)
             return array
 
         # Recursive case
@@ -66,18 +64,13 @@ class Lattice:
             maxLen = self.dimensions[i]
 
             neighborPositionA = position[:]
-#            print "nA: ", neighborPositionA
             neighborPositionA[i] = (position[i] + 1)%maxLen
-#            print "nA: ", neighborPositionA
 
             neighborPositionB = position[:]
-#            print "nB: ", neighborPositionB
             neighborPositionB[i] = (position[i] - 1)%maxLen
-#            print "nB: ", neighborPositionB
 
             neighbors.append(neighborPositionA)
             neighbors.append(neighborPositionB)
-#            print "neighbors ", neighbors
 
         return neighbors
 
